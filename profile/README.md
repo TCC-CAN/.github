@@ -28,12 +28,16 @@ flowchart LR
     GW --> ID[Identity Service]
     GW --> CO[Collection Service]
     GW --> ORG[Organization Service]
+    GW --> BOT[Chatbot Service]
     CO --> ID
     ORG --> ID
     ID --> DB[(MySQL)]
     CO --> DB
     ORG --> DB
     CO --> CACHE[(Redis)]
+    ID --> STORE[(MinIO)]
+    CO --> STORE
+    BOT --> AI[Ollama]
 ```
 
 Os clientes acessam apenas o API Gateway. Os microserviços permanecem isolados na rede interna Docker e são encontrados por DNS de serviço, sem exposição direta de portas no host.
@@ -65,7 +69,10 @@ CAN
         ├── API Gateway
         ├── Identity Service
         ├── Collection Service
-        └── Organization Service
+        ├── Organization Service
+        ├── Chatbot Service
+        ├── MinIO
+        └── Ollama
 ```
 
 O aplicativo mobile é executado diretamente pelo Expo e não precisa de container.
@@ -81,14 +88,15 @@ O aplicativo mobile é executado diretamente pelo Expo e não precisa de contain
 
 ## Como obter o projeto completo
 
-```bash
-git clone --recurse-submodules https://github.com/TCC-CAN/CAN.git
+```powershell
+git clone https://github.com/TCC-CAN/CAN.git
 cd CAN
-cp .env.example .env
-docker compose --env-file .env -f compose.yaml up -d --build
+.\start.ps1
 ```
 
-Antes da primeira execução, substitua todas as credenciais e segredos de exemplo no arquivo `.env`.
+O inicializador sincroniza os submódulos, cria o ambiente local com segredos,
+aplica migrations e permissões e inicia toda a infraestrutura. Nas próximas
+atualizações, execute novamente apenas `.\start.ps1`.
 
 ## Objetivo acadêmico
 
